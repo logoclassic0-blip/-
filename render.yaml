@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: logo-classic
+    runtime: python
+    region: frankfurt
+    plan: 0.5c-512mb
+    numInstances: 1
+    buildCommand: python -m zipfile -e logo-classic-app.zip application && pip install -r application/requirements.txt
+    startCommand: gunicorn --chdir application --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120 app:app
+    healthCheckPath: /api/session
+    disk:
+      name: logo-classic-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.13.16"
+      - key: DATA_DIR
+        value: /var/data/logo-classic
+      - key: COOKIE_SECURE
+        value: "1"
+      - key: PYTHONUNBUFFERED
+        value: "1"
